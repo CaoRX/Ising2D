@@ -1,0 +1,6 @@
+cmake_minimum_required (VERSION 2.8)
+project (Ising2D)
+# aux_source_directory(. DIR_SRCS)
+# add_executable(Ising2Dexec ${DIR_SRCS})
+include_directories(${PROJECT_SOURCE_DIR})
+add_subdirectory(main)
