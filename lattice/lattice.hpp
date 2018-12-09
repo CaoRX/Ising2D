@@ -4,6 +4,7 @@
 #include <config/Parameters.hpp>
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 const int nn_dx[4] = {0, 0, 1, -1};
 const int nn_dy[4] = {1, -1, 0, 0};
 const int nnn_dx[4] = {1, 1, -1, -1};
@@ -13,19 +14,25 @@ class ISING_LATTICE
 private:
 	bool **a;
 	int n, m;
-	double Energy;
 	double Beta;
+	double Energy;
+	double Mag;
 
 public:
-	ISING_LATTICE(int N, int M): n(N), m(M)
+	ISING_LATTICE(int N, int M, double T): n(N), m(M), Beta(1.0 / T)
 	{
 		a = new bool*[N];
 		for (int i = 0; i < N; ++i)
 		{
 			a[i] = new bool[M];
 			for (int j = 0; j < M; ++j)
-				a[i][j] = 0;
+				a[i][j] = (random_double() < 0.5) ? true : false;
 		}
+		Mag = Magnets();
+		Energy = Energy_Field();
+		Energy += Energy_NN();
+		if (Config::USE_NNN)
+			Energy += Energy_NNN();
 	}
 	int getS(int x, int y)
 	{
@@ -51,12 +58,13 @@ public:
 	void flipS(int x, int y)
 	{
 		Energy += flip_delta_Energy(x, y);
+		Mag -= (2.0 * getS(x, y));
 		a[(x + n) % n][(y + m) % m] = (!a[(x + n) % n][(y + m) % m]);
 	}
-	void setS(int x, int y, bool value)
-	{
-		a[(x + n) % n][(y + m) % m] = (value == 1);
-	}
+	//void setS(int x, int y, bool value)
+	//{
+	//	a[(x + n) % n][(y + m) % m] = (value == 1);
+	//}
 	double Energy_Field()
 	{
 		double res = 0;
@@ -72,7 +80,7 @@ public:
 			for (int j = 0; j < m; ++j)
 				for (int dir = 0; dir < 4; ++dir)
 					res -= Config::J_NN * (a[i][j] ? 1 : -1) * getS(i + nn_dx[dir], j + nn_dy[dir]);
-		return res;
+		return res * 0.5;
 	}
 	double Energy_NNN()
 	{
@@ -81,6 +89,14 @@ public:
 			for (int j = 0; j < m; ++j)
 				for (int dir = 0; dir < 4; ++dir)
 					res -= Config::J_NNN * (a[i][j] ? 1 : -1) * getS(i + nnn_dx[dir], j + nnn_dy[dir]);
+		return res * 0.5;
+	}
+	double Magnets()
+	{
+		double res = 0;
+		for (int i = 0; i < n; ++i)
+			for (int j = 0; j < m; ++j)
+				res += getS(i, j);
 		return res;
 	}
 
@@ -94,6 +110,14 @@ public:
 	}
 	void Metro_Sweep();
 	void Heatbath_Sweep();
+	double get_Energy()
+	{
+		return Energy / (n * m);
+	}
+	double get_Magnet()
+	{
+		return Mag / (n * m);
+	}
 	//void Metro_Sweep()
 	//{
 	//	for (int i = 0; i <)
