@@ -9,5 +9,6 @@ const bool USE_NNN = false;
 const int default_n = 100;
 const int default_m = 100;
 }
+extern double random_double();
 
 #endif
