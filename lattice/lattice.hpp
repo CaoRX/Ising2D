@@ -19,6 +19,8 @@ private:
 	double Mag;
 
 public:
+	double *corr;
+	int corr_size;
 	ISING_LATTICE(int N, int M, double T): n(N), m(M), Beta(1.0 / T)
 	{
 		a = new bool*[N];
@@ -33,6 +35,8 @@ public:
 		Energy += Energy_NN();
 		if (Config::USE_NNN)
 			Energy += Energy_NNN();
+		corr_size = std::min(n, m) / 2;
+		corr = new double[corr_size];
 	}
 	int getS(int x, int y)
 	{
@@ -118,6 +122,22 @@ public:
 	{
 		return Mag / (n * m);
 	}
+	void update_corr()
+	{
+		for (int i = 0; i < corr_size; ++i)
+		{
+			corr[i] = 0.0;
+			for (int x = 0; x < n; ++x)
+				for (int y = 0; y < m; ++y)
+					corr[i] += getS(x, y) * getS(x + i, y + i);
+			corr[i] /= (n * m);
+		}
+	}
+	double get_corr(int x)
+	{
+		return corr[x];
+	}
+
 	//void Metro_Sweep()
 	//{
 	//	for (int i = 0; i <)
