@@ -185,10 +185,6 @@ public:
 		delete []f;
 		delete []vf;
 	}
-	//void Metro_Sweep()
-	//{
-	//	for (int i = 0; i <)
-	//}
 };
 
 #endif
