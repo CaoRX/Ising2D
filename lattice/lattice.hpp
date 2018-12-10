@@ -13,23 +13,35 @@ class ISING_LATTICE
 {
 private:
 	bool **a;
+	bool **vis;
+	int *f;
+	int *vf;
 	int n, m;
 	double Beta;
 	double Energy;
 	double Mag;
+	double expJ;
 
 public:
 	double *corr;
 	int corr_size;
 	ISING_LATTICE(int N, int M, double T): n(N), m(M), Beta(1.0 / T)
 	{
+		vis = new bool*[N];
 		a = new bool*[N];
 		for (int i = 0; i < N; ++i)
 		{
 			a[i] = new bool[M];
+			vis[i] = new bool[M];
 			for (int j = 0; j < M; ++j)
+			{
 				a[i][j] = (random_double() < 0.5) ? true : false;
+				vis[i][j] = false;
+			}
+
 		}
+		f = new int[N * M];
+		vf = new int[N * N];
 		Mag = Magnets();
 		Energy = Energy_Field();
 		Energy += Energy_NN();
@@ -37,10 +49,15 @@ public:
 			Energy += Energy_NNN();
 		corr_size = std::min(n, m) / 2;
 		corr = new double[corr_size];
+		expJ = exp(-Config::J_NN);
 	}
 	int getS(int x, int y)
 	{
 		return (a[(x + n) % n][(y + m) % m] ? 1 : -1);
+	}
+	bool getvis(int x, int y)
+	{
+		return (vis[(x + n) % n][(y + m) % m]);
 	}
 	double local_Energy(int x, int y)
 	{
@@ -114,6 +131,8 @@ public:
 	}
 	void Metro_Sweep();
 	void Heatbath_Sweep();
+	void SW_Update();
+	void Wolff_Update();
 	double get_Energy()
 	{
 		return Energy / (n * m);
@@ -137,7 +156,34 @@ public:
 	{
 		return corr[x];
 	}
-
+	int gf(int x)
+	{
+		if (f[x] == x) {
+			return x;
+		}
+		f[x] = gf(f[x]);
+		return f[x];
+	}
+	void combine(int x, int y)
+	{
+		f[gf(x)] = gf(y);
+	}
+	int num_1d(int x, int y)
+	{
+		x = (x + n) % n;
+		y = (y + m) % m;
+		return x * m + y;
+	}
+	~ISING_LATTICE()
+	{
+		for (int i = 0; i < n; ++i) {
+			delete []a[i];
+			delete []vis[i];
+		}
+		delete []a;
+		delete []vis;
+		delete []f;
+	}
 	//void Metro_Sweep()
 	//{
 	//	for (int i = 0; i <)

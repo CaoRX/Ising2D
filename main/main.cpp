@@ -22,7 +22,7 @@ void calc_ising(double temp, int latt, int loop_num = 10000, int equil = 100, bo
 	Latt.push_back(latt);
 	ISING_LATTICE IL(latt, latt, temp);
 	double *corr = new double[IL.corr_size];
-	double Energy_sum, Magnet_sum;
+	double Energy_sum = 0.0, Magnet_sum = 0.0;
 	int corr_size = IL.corr_size;
 	for (int i = 0; i < corr_size; ++i)
 		corr[i] = 0.0;
@@ -36,6 +36,8 @@ void calc_ising(double temp, int latt, int loop_num = 10000, int equil = 100, bo
 		{
 			IL.Metro_Sweep();
 		}
+		
+		//IL.Wolff_Update();
 		if (i < equil)
 		{
 			continue;
@@ -92,6 +94,7 @@ const int lattice_grid[lattice_num] = {10, 30, 50, 70, 100};
 const int temp_num = 10;
 const double temp_grid[temp_num] = {1.0, 1.5, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 3.0, 5.0};
 const double detail_grid[temp_num] = {2.2, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29};
+// critical temperature \approx 2.27
 void output_lists(FILE *f)
 {
 	for (int i = 0; i < Temp.size(); ++i) {

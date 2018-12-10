@@ -10,5 +10,5 @@ const int default_n = 100;
 const int default_m = 100;
 }
 extern double random_double();
-
+extern int random_int(int n) ;
 #endif

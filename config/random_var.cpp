@@ -3,6 +3,7 @@
 
 #include <random>
 #include <ctime>
+#include <cstdlib>
 using namespace std;
 
 unsigned random_seed = (unsigned)time(NULL);
@@ -15,5 +16,8 @@ double random_double()
 {
 	return random_Double(e);
 }
-
+int random_int(int n)
+{
+	return rand() % n;
+}
 #endif
