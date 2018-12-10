@@ -183,6 +183,7 @@ public:
 		delete []a;
 		delete []vis;
 		delete []f;
+		delete []vf;
 	}
 	//void Metro_Sweep()
 	//{
