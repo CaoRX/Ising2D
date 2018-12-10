@@ -1,2 +1,7 @@
 # Ising2D
-tests on 2D Ising model
+Tests on 2D Ising model, trying to use finite size scaling.
+
+cmake [path]
+make
+
+no in-source compile.
