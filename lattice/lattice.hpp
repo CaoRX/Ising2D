@@ -49,7 +49,7 @@ public:
 			Energy += Energy_NNN();
 		corr_size = std::min(n, m) / 2;
 		corr = new double[corr_size];
-		expJ = exp(-Config::J_NN);
+		expJ = exp(Config::J_NN);
 	}
 	int getS(int x, int y)
 	{
@@ -66,10 +66,16 @@ public:
 		int sxy = getS(x, y);
 		double res = -Config::Magnet_Field * sxy;
 		for (int i = 0; i < 4; ++i)
-			res -= Config::J_NN * sxy * getS(x + nn_dx[i], y + nn_dy[i]);
+			res += Config::J_NN * sxy * getS(x + nn_dx[i], y + nn_dy[i]);
 		if (Config::USE_NNN)
-		for (int i = 0; i < 4; ++i)
-			res -= Config::J_NNN * sxy * getS(x + nnn_dx[i], y + nnn_dy[i]);
+		for (int i = 0; i < 4; ++i) {
+			if ((x + y) & 1) {
+				res += Config::J_NNN_1 * sxy * getS(x + nnn_dx[i], y + nnn_dy[i]);
+			}
+			else {
+				res += Config::J_NNN_2 * sxy * getS(x + nnn_dx[i], y + nnn_dy[i]);
+			}
+		}
 		return res;
 	}
 	double flip_delta_Energy(int x, int y)
@@ -100,16 +106,25 @@ public:
 		for (int i = 0; i < n; ++i)
 			for (int j = 0; j < m; ++j)
 				for (int dir = 0; dir < 4; ++dir)
-					res -= Config::J_NN * (a[i][j] ? 1 : -1) * getS(i + nn_dx[dir], j + nn_dy[dir]);
+					res += Config::J_NN * (a[i][j] ? 1 : -1) * getS(i + nn_dx[dir], j + nn_dy[dir]);
 		return res * 0.5;
 	}
 	double Energy_NNN()
 	{
 		double res = 0;
-		for (int i = 0; i < n; ++i)
-			for (int j = 0; j < m; ++j)
-				for (int dir = 0; dir < 4; ++dir)
-					res -= Config::J_NNN * (a[i][j] ? 1 : -1) * getS(i + nnn_dx[dir], j + nnn_dy[dir]);
+		int sxy;
+		for (int x = 0; i < n; ++x)
+			for (int y = 0; j < m; ++y)
+				for (int dir = 0; dir < 4; ++dir) {
+					sxy = (a[x][y] ? 1 : -1);
+					if ((x + y) & 1) {
+						res += Config::J_NNN_1 * sxy * getS(x + nnn_dx[i], y + nnn_dy[i]);
+					}
+					else {
+						res += Config::J_NNN_2 * sxy * getS(x + nnn_dx[i], y + nnn_dy[i]);
+					}
+					//res -= Config::J_NNN * (a[i][j] ? 1 : -1) * getS(i + nnn_dx[dir], j + nnn_dy[dir]);
+				}
 		return res * 0.5;
 	}
 	double Magnets()
