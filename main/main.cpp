@@ -134,11 +134,11 @@ int main(int argc, char **argv)
 	//fclose(magnet_f);
 	//fclose(corr_f);
 	//std::cout << corr_length(corr, IL.corr_size) << std::endl;
-	for (int i = 0; i < lattice_num; ++i)
-		for (int j = 0; j < temp_num; ++j)
-			calc_ising(detail_grid[j], lattice_grid[i]);
-	FILE *result_file = fopen("data/result.dat", "w");
-	output_lists(result_file);
+	//for (int i = 0; i < lattice_num; ++i)
+	//	for (int j = 0; j < temp_num; ++j)
+	//		calc_ising(detail_grid[j], lattice_grid[i]);
+	//FILE *result_file = fopen("data/result.dat", "w");
+	//output_lists(result_file);
 	return 0;
 }
 
